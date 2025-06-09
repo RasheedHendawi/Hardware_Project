@@ -1,5 +1,6 @@
 #include "motor.h"
 #include "mems.h"
+#include "ultrasonic.h"
 
 // Begin Declare Pins
 #define LeftRelayEnable 2  //MOTORS
@@ -10,7 +11,7 @@
 // Variables For Timing
 unsigned long startMillisMotors;  //some global variables available anywhere in the program
 unsigned long currentMillisMotors;
-const unsigned long periodMotors = 6000;  //the value is a number of milliseconds
+const unsigned long periodMotors = 20;  //the value is a number of milliseconds
 // bool flagDirectionForwardBackward = false; // To make it goes Forward and Backward ulternative
 // End Declare Variables
 
@@ -27,19 +28,19 @@ void setup() {
   pinMode(LeftRelayEnable, OUTPUT);
   pinMode(RightRelayEnable, OUTPUT);
 
-  digitalWrite(LeftRelayEnable, LOW); // LOW is turn on, HIGH is turn off
-  digitalWrite(RightRelayEnable, HIGH);
+  digitalWrite(LeftRelayEnable, HIGH); // LOW is turn on, HIGH is turn off
+  digitalWrite(RightRelayEnable, LOW);
 
   delay(5000); // This is for the mpu to take time to setup
 }
 
 void loop() {
-  currentMillisMotors = millis();  //get the current "time" (actually the number of milliseconds since the program started)
-  if (currentMillisMotors - startMillisMotors >= periodMotors)  //test whether the period has elapsed
-  {
-    // TODO
-    MotorRotateTo(0);
-    startMillisMotors = currentMillisMotors;  //IMPORTANT to save the start time of the current LED state.
-  }
-  // FirstMems();
+  // currentMillisMotors = millis();  //get the current "time" (actually the number of milliseconds since the program started)
+  // if (currentMillisMotors - startMillisMotors >= periodMotors)  //test whether the period has elapsed
+  // {
+  //   // TODO
+  //   getDistanceFrontUltrasonic();
+  //   startMillisMotors = currentMillisMotors;  //IMPORTANT to save the start time of the current LED state.
+  // }
+  FirstMems();
 }
