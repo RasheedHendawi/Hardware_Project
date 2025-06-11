@@ -134,6 +134,7 @@ void MotorRotateLeft() {
   digitalWrite(BackRightInput2, LOW);
 }
 
+// The value between 0 - 359
 void MotorRotateTo(float degreeValue) {
   SetupMotorPower(80);
   float *yawPitchRoll = new float[3];
@@ -154,14 +155,14 @@ void MotorRotateTo(float degreeValue) {
 
   // This is for detect left or right
   if(distanceLeft < distanceRight) {
-    while(distanceLeft > 4) {
+    while(distanceLeft > 4) { // Error percentage
       MotorRotateLeft();
       yawPitchRoll = getYawPitchRoll();
       yaw = yawPitchRoll[0];
       minus(yaw);
       distanceLeft = yaw - degreeValue;
       minus(distanceLeft);
-      SetupMotorPower(max(distanceLeft, 40));
+      SetupMotorPower(max(distanceLeft, 40)); // To adjust the speed of rotate
     }
   } else {
     while(distanceRight > 4) {
