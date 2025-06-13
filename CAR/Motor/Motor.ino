@@ -14,10 +14,24 @@ unsigned long startMillisMotors;  //some global variables available anywhere in 
 unsigned long currentMillisMotors;
 const unsigned long periodMotors = 20;  //the value is a number of milliseconds
 // bool flagDirectionForwardBackward = false; // To make it goes Forward and Backward ulternative
+
+String data;
+float *yprCar;
+float distanceLidar;
 // End Declare Variables
 
 void setup() {
   Serial.begin(115200);
+  Serial1.begin(115200);
+
+  // Laser Begin initialize
+  pinMode(37, OUTPUT);
+  pinMode(39, OUTPUT);
+  pinMode(41, OUTPUT);
+  digitalWrite(37, LOW);
+  digitalWrite(39, HIGH);
+  digitalWrite(41, HIGH);
+  // Laser End initialize
 
   // Begin Lidar Setup
   SetupLidar();
@@ -33,13 +47,12 @@ void setup() {
   pinMode(RightRelayEnable, OUTPUT);
 
   digitalWrite(LeftRelayEnable, HIGH); // LOW is turn on, HIGH is turn off
-  digitalWrite(RightRelayEnable, LOW);
+  digitalWrite(RightRelayEnable, HIGH);
 
   delay(5000); // This is for the mpu to take time to setup
 }
 
 void loop() {
-  // Serial.println("Hello");
   // currentMillisMotors = millis();  //get the current "time" (actually the number of milliseconds since the program started)
   // if (currentMillisMotors - startMillisMotors >= periodMotors)  //test whether the period has elapsed
   // {
@@ -47,6 +60,12 @@ void loop() {
   //   getDistanceFrontUltrasonic();
   //   startMillisMotors = currentMillisMotors;  //IMPORTANT to save the start time of the current LED state.
   // }
-  Serial.println(getDistanceLidar());
+  yprCar = getYawPitchRoll();
+  distanceLidar = getDistanceLidar();
+  data = String(yprCar[0], 2) + "," + 
+                String(yprCar[1], 2) + "," + 
+                String(yprCar[2], 2) + "," + 
+                String(distanceLidar);
+  Serial1.println(data);
   FirstMems();
 }
