@@ -10,7 +10,7 @@ HardwareSerial ArduinoSerial(2); // Use UART1 on ESP32
 MPUClass MPUHorizontal(1);
 MPUClass MPUVertical(2);
 float* yprHorizontal, *yprVertical;
-char packet[50];
+char packet[100];
 
 void setup() {
   Serial.begin(115200);
@@ -29,11 +29,11 @@ void setup() {
 void loop() {
   if (ArduinoSerial.available()) {
     String msg = ArduinoSerial.readStringUntil('\n');
-    
+
     yprHorizontal = MPUHorizontal.getYawPitchRoll();
     yprVertical = MPUVertical.getYawPitchRoll();
 
-    snprintf(packet, 50, "%.2f,%.2f,%s\n", yprHorizontal[0], yprVertical[1], msg.c_str());
+    snprintf(packet, 100, "%.2f,%.2f,%s\n", yprHorizontal[0], yprVertical[1], msg.c_str());
     // Serial.print(packet);
     UDPSendPacket(packet);
   }

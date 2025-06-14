@@ -1,4 +1,97 @@
 #include "I2Cdev.h"
+#include "MPU6050_6Axis_MotionApps20.h"
+
+#define EARTH_GRAVITY_MS2 9.80665
+#define DEG_TO_RAD        0.017453292519943295769236907684886
+#define RAD_TO_DEG        57.295779513082320876798154814105
+
+MPU6050 mpu;
+
+bool DMPReady = false;
+uint8_t devStatus;
+uint16_t packetSize;
+uint8_t FIFOBuffer[64];
+
+Quaternion q;
+VectorInt16 aa;
+VectorInt16 aaWorld;
+VectorFloat gravity;
+float ypr[3];
+float retunValue[6];
+
+void SetupGyro() {
+  #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
+    Wire.begin();
+    Wire.setClock(400000); // 400kHz I2C clock. Comment on this line if having compilation difficulties
+  #elif I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE
+    Fastwire::setup(400, true);
+  #endif
+
+  Serial.begin(115200);
+  Serial.println(F("Initializing MPU6050..."));
+  mpu.initialize();
+
+  if (!mpu.testConnection()) {
+    Serial.println("MPU6050 connection failed");
+    while (true);
+  }
+
+  Serial.println("MPU6050 connected");
+  devStatus = mpu.dmpInitialize();
+
+  // Set offsets if needed
+  mpu.setXGyroOffset(0);
+  mpu.setYGyroOffset(0);
+  mpu.setZGyroOffset(0);
+  mpu.setXAccelOffset(0);
+  mpu.setYAccelOffset(0);
+  mpu.setZAccelOffset(0);
+
+  if (devStatus == 0) {
+    mpu.CalibrateAccel(6);
+    mpu.CalibrateGyro(6);
+    mpu.PrintActiveOffsets();
+    mpu.setDMPEnabled(true);
+    DMPReady = true;
+    packetSize = mpu.dmpGetFIFOPacketSize();
+    Serial.println("DMP ready.");
+  } else {
+    Serial.print("DMP Initialization failed (code ");
+    Serial.print(devStatus);
+    Serial.println(")");
+  }
+}
+
+float *getYawPitchRoll() {
+  while (!mpu.dmpGetCurrentFIFOPacket(FIFOBuffer));
+    mpu.dmpGetQuaternion(&q, FIFOBuffer);
+    mpu.dmpGetGravity(&gravity, &q);
+    mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
+
+    mpu.dmpGetAccel(&aa, FIFOBuffer);
+    mpu.dmpConvertToWorldFrame(&aaWorld, &aa, &q);
+
+    // Yaw, Pitch, Roll in degrees
+    retunValue[0] = ypr[0] * RAD_TO_DEG;
+    retunValue[1] = ypr[1] * RAD_TO_DEG;
+    retunValue[2] = ypr[2] * RAD_TO_DEG;
+
+    // Acceleration in world frame in m/s^2
+    retunValue[3] = aaWorld.x * mpu.get_acce_resolution() * EARTH_GRAVITY_MS2;
+    retunValue[4] = aaWorld.y * mpu.get_acce_resolution() * EARTH_GRAVITY_MS2;
+    retunValue[5] = aaWorld.z * mpu.get_acce_resolution() * EARTH_GRAVITY_MS2;
+
+    return retunValue;
+    // // Output (for sending over UDP or serial)
+    // Serial.print(yaw_deg); Serial.print(",");
+    // Serial.print(pitch_deg); Serial.print(",");
+    // Serial.print(roll_deg); Serial.print(",");
+    // Serial.print(ax); Serial.print(",");
+    // Serial.print(ay); Serial.print(",");
+    // Serial.println(az);
+}
+
+/*#include "I2Cdev.h"
 
 #include "MPU6050_6Axis_MotionApps20.h"
 
@@ -94,4 +187,4 @@ float *getYawPitchRoll() {
   ypr[1] = ypr[1] * 180/M_PI;
   ypr[2] = ypr[2] * 180/M_PI;
   return ypr;
-}
+}*/

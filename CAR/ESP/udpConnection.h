@@ -8,7 +8,7 @@ const char *networkPswd = "10203040";
 //IP address to send UDP data to:
 // either use the ip address of the server or
 // a network broadcast address
-const char *udpAddress = "192.168.1.102";
+const char *udpAddress = "192.168.1.74";
 const int udpPort = 8888;
 
 //Are we currently connected?

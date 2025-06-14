@@ -17,7 +17,7 @@ const unsigned long periodMotors = 20;  //the value is a number of milliseconds
 
 String data;
 float *yprCar;
-float distanceLidar;
+int distanceLidar;
 // End Declare Variables
 
 void setup() {
@@ -64,8 +64,13 @@ void loop() {
   distanceLidar = getDistanceLidar();
   data = String(yprCar[0], 2) + "," + 
                 String(yprCar[1], 2) + "," + 
-                String(yprCar[2], 2) + "," + 
-                String(distanceLidar);
+                String(yprCar[2], 2) + "," +
+                String(distanceLidar) + "," + 
+                String(yprCar[3], 2) + "," + 
+                String(yprCar[4], 2) + "," + 
+                String(yprCar[5], 2);
+                // "9";
+  // Serial.println(data);
   Serial1.println(data);
   FirstMems();
 }
