@@ -2,6 +2,7 @@
 #include "mems.h"
 #include "ultrasonic.h"
 #include "lidar.h"
+#include "laser.h"
 
 // Begin Declare Pins
 #define LeftRelayEnable 2  //MOTORS
@@ -12,7 +13,7 @@
 // Variables For Timing
 unsigned long startMillisMotors;  //some global variables available anywhere in the program
 unsigned long currentMillisMotors;
-const unsigned long periodMotors = 20;  //the value is a number of milliseconds
+const unsigned long periodMotors = 5000;  //the value is a number of milliseconds
 // bool flagDirectionForwardBackward = false; // To make it goes Forward and Backward ulternative
 
 String data;
@@ -24,17 +25,13 @@ void setup() {
   Serial.begin(115200);
   Serial1.begin(115200);
 
-  // Laser Begin initialize
-  pinMode(37, OUTPUT);
-  pinMode(39, OUTPUT);
-  pinMode(41, OUTPUT);
-  digitalWrite(37, LOW);
-  digitalWrite(39, HIGH);
-  digitalWrite(41, HIGH);
-  // Laser End initialize
+  // Begin Laser Setup
+  SetupLaser();
+  LaserStatus(1);
 
   // Begin Lidar Setup
   SetupLidar();
+  Serial.println("Hello");
 
   // Begin Motor Setup
   SetupMotors();
@@ -57,9 +54,10 @@ void loop() {
   // if (currentMillisMotors - startMillisMotors >= periodMotors)  //test whether the period has elapsed
   // {
   //   // TODO
-  //   getDistanceFrontUltrasonic();
+  //   MotorRotateTo(0);. ;
   //   startMillisMotors = currentMillisMotors;  //IMPORTANT to save the start time of the current LED state.
   // }
+  // MotorGoForward();
   yprCar = getYawPitchRoll();
   distanceLidar = getDistanceLidar();
   data = String(yprCar[0], 2) + "," + 
@@ -72,5 +70,5 @@ void loop() {
                 // "9";
   // Serial.println(data);
   Serial1.println(data);
-  FirstMems();
+  // FirstMems();
 }

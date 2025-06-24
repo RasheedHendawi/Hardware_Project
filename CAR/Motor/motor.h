@@ -17,13 +17,15 @@
 #define BackRightInput1 28 //Wheel
 #define BackRightInput2 29 //Wheel
 
+#define BackLeftRatio 0.4 //Ratio to make all motors with the same speed
+
 #define SizeOutput 12 // Array to make all of that is output
 int arrayOutput[SizeOutput] = {FrontLeftEnable, FrontRightEnable, BackLeftEnable, BackRightEnable, FrontLeftInput1, FrontLeftInput2, FrontRightInput1, FrontRightInput2, BackLeftInput1, BackLeftInput2, BackRightInput1, BackRightInput2};
 
 void SetupMotorPower(int valueOfPower) {
   analogWrite(FrontLeftEnable, valueOfPower); // To make all motors run on valueOfPower power
   analogWrite(FrontRightEnable, valueOfPower);
-  analogWrite(BackLeftEnable, valueOfPower);
+  analogWrite(BackLeftEnable, valueOfPower * BackLeftRatio);
   analogWrite(BackRightEnable, valueOfPower);
 }
 
@@ -136,7 +138,7 @@ void MotorRotateLeft() {
 
 // The value between 0 - 359
 void MotorRotateTo(float degreeValue) {
-  SetupMotorPower(80);
+  SetupMotorPower(100);
   float *yawPitchRoll = new float[3];
   yawPitchRoll = getYawPitchRoll();
   auto minus = [](float &value) -> void {
