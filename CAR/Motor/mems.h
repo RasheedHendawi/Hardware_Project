@@ -63,3 +63,8 @@ void SecondMems() {
     startMillisMEMS2 = currentMillisMEMS2;  //IMPORTANT to save the start time of the current LED state.
   }
 }
+
+void twoMems() {
+  FirstMems();
+  SecondMems();
+}

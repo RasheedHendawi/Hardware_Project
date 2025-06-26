@@ -57,4 +57,5 @@ std::pair<double, double> getXY(float theta) {
   lastDistanceXY = distance;
   X += currentDistance * cos(theta);
   Y += currentDistance * sin(theta);
+  return {X, Y};
 }

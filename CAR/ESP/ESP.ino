@@ -28,7 +28,7 @@ void setup() {
 
   ArduinoSerial.begin(115200, SERIAL_8N1, 16, 17);  // RX=3, TX=1
 
-  delay(5000);
+  // delay(5000);
 }
 
 void loop() {
@@ -51,7 +51,7 @@ void loop() {
     yprVertical = MPUVertical.getYawPitchRoll();
 
     snprintf(packet, 100, "%.2f,%.2f,%s,%f\n", yprHorizontal[0], yprVertical[1], msg.c_str(), getVelocity());
-    Serial.print(packet);
+    // Serial.print(packet);
     UDPSendPacket(packet);
   }
   // ReadOdom();
