@@ -2,7 +2,7 @@
 #include <NetworkUdp.h>
 
 // WiFi network name and password:
-const char *networkName = "Sous";
+const char *networkName = "Ahmadbik";
 const char *networkPswd = "10203040";
 
 //IP address to send UDP data to:

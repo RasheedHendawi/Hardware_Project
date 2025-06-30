@@ -1,3 +1,4 @@
+#include "HardwareSerial.h"
 #include "Arduino.h"
 #include "gyro.h"
 
@@ -17,13 +18,15 @@
 #define BackRightInput1 28 //Wheel
 #define BackRightInput2 29 //Wheel
 
+#define BackLeftRatio 0.35 //Ratio to make all motors with the same speed
+
 #define SizeOutput 12 // Array to make all of that is output
 int arrayOutput[SizeOutput] = {FrontLeftEnable, FrontRightEnable, BackLeftEnable, BackRightEnable, FrontLeftInput1, FrontLeftInput2, FrontRightInput1, FrontRightInput2, BackLeftInput1, BackLeftInput2, BackRightInput1, BackRightInput2};
 
 void SetupMotorPower(int valueOfPower) {
   analogWrite(FrontLeftEnable, valueOfPower); // To make all motors run on valueOfPower power
   analogWrite(FrontRightEnable, valueOfPower);
-  analogWrite(BackLeftEnable, valueOfPower);
+  analogWrite(BackLeftEnable, valueOfPower * BackLeftRatio);
   analogWrite(BackRightEnable, valueOfPower);
 }
 
@@ -136,7 +139,8 @@ void MotorRotateLeft() {
 
 // The value between 0 - 359
 void MotorRotateTo(float degreeValue) {
-  SetupMotorPower(80);
+  MotorSteady();
+  SetupMotorPower(100);
   float *yawPitchRoll = new float[3];
   yawPitchRoll = getYawPitchRoll();
   auto minus = [](float &value) -> void {
@@ -153,28 +157,30 @@ void MotorRotateTo(float degreeValue) {
   float distanceRight = degreeValue - yaw;
   minus(distanceRight);
 
+  // Serial.print("Right ------> ");
+  // Serial.print(distanceRight);
+  // Serial.print("\t distance left <------ ");
+  // Serial.println(distanceLeft);
+
   // This is for detect left or right
   if(distanceLeft < distanceRight) {
-    while(distanceLeft > 4) { // Error percentage
+    if (distanceLeft > 6) { // Error percentage
       MotorRotateLeft();
-      yawPitchRoll = getYawPitchRoll();
-      yaw = yawPitchRoll[0];
-      minus(yaw);
       distanceLeft = yaw - degreeValue;
       minus(distanceLeft);
       SetupMotorPower(max(distanceLeft, 40)); // To adjust the speed of rotate
+    } else {
+        MotorSteady();
     }
   } else {
-    while(distanceRight > 4) {
+    if(distanceRight > 6) {
       MotorRotateRight();
-      yawPitchRoll = getYawPitchRoll();
-      yaw = yawPitchRoll[0];
-      minus(yaw);
       distanceRight = degreeValue - yaw;
       minus(distanceRight);
       SetupMotorPower(max(distanceRight, 40));
+    } else {
+      MotorSteady();
     }
   }
-  MotorSteady();
   SetupMotorPower(255);
 }
